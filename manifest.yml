@@ -1,0 +1,4 @@
+applications:
+- name: crdtdemo
+  command: node server.js
+  buildpack: https://github.com/cloudfoundry/nodejs-buildpack

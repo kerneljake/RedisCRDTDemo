@@ -13,21 +13,28 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var redis = require('redis');
+var cfenv = require("cfenv");
 
-var httpPort = process.argv[2] || 3000;
-var redisPort = process.argv[3] || 6379;
-process.env.location = process.argv[4] || "";
+var appEnv = cfenv.getAppEnv().services.redislabs[0];
+
+var redisPort = appEnv.credentials.port || 6379;
+var redisHost = appEnv.credentials.ip_list[0] || 'localhost';
+var redisPassword = appEnv.credentials.password || null;
+var httpPort = process.env.PORT || 3000;
+process.env.location = redisHost;
 
 // Redis client to query and publish to a channel
 var redisClient = redis.createClient({
   port : redisPort,
-  host : 'localhost'
+  host : redisHost,
+  password: redisPassword
 });
 
 // Redis client to listen to a channel
 var redisSub = redis.createClient({
   port : redisPort,
-  host : 'localhost'
+  host : redisHost,
+  password: redisPassword
 });
 
 // Init modules to process get and post parameters
